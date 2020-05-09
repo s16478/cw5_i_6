@@ -130,8 +130,6 @@ namespace aplikacja5.Controllers
             return Ok(newStudentEnrollment);
         }  // end of method EnrollStudent
 
-      
-
     }
 }
 
