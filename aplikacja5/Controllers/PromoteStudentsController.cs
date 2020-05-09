@@ -41,30 +41,32 @@ namespace aplikacja5.Controllers
                 catch (SqlException e)
                 {
                     transaction.Rollback();
-                    return null;
+                    return BadRequest("Error - studies with given name do not exist!");
                 }
 
 
                 com.CommandText = "SELECT * FROM Enrollment WHERE IdStudy = (SELECT IdStudy FROM Studies WHERE Name = @Name AND Semester = @Semester + 1)";
-
+                Enrollment newPromotionEnrollment = null;
                 var dataReader = com.ExecuteReader();
                 {
-                    if (!dataReader.Read())
+                    if (dataReader.Read())
+                    {
+                        newPromotionEnrollment = new Enrollment()
+                        {
+                            IdEnrollment = (int)dataReader["IdEnrollment"],
+                            IdStudy = (int)dataReader["IdStudy"],
+                            Semester = (int)dataReader["Semester"],
+                            StartDate = (DateTime)dataReader["StartDate"]
+                        };
+                    }
+                    else
                     {
                         return null;
                     }
 
-                    Enrollment newPromotionEnrollment = new Enrollment()
-                    {
-                        IdEnrollment = (int)dataReader["IdEnrollment"],
-                        IdStudy = (int)dataReader["IdStudy"],
-                        Semester = (int)dataReader["Semester"],
-                        StartDate = (DateTime)dataReader["StartDate"]
-                    };
-
                     dataReader.Close();
-
-                    return Ok(newPromotionEnrollment);
+                    // returning 201 -- return Created (uri, objectValue)
+                    return Created("api/enrollments/promotions", newPromotionEnrollment);
                 }  // end of method PromoteStudent
 
 
