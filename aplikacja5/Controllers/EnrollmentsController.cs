@@ -19,7 +19,6 @@ namespace aplikacja5.Controllers
         }
 
 
-
         [HttpPost]
         [Route("api/enrollments")]
         // dodanie nowego studenta i zapisanie go na semestr
@@ -45,10 +44,6 @@ namespace aplikacja5.Controllers
 
 
 
-
-
-
-
         [HttpPost]
         [Route("api/enrollments/promotions")]
         // promocja studentow na nowy semestr danych studiow
@@ -63,9 +58,6 @@ namespace aplikacja5.Controllers
             return Ok(newPromotion);
 
         }  // end of method PromoteStudent
-
-
-
     }
 }
 

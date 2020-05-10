@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace aplikacja5.Services
 {
-    public class StudentsDbService : IStudentsDbService
+    public class SqlServerDbService : IStudentsDbService
     {
 
         private const string CONNECTION_STRING = "Data Source=db-mssql;Initial Catalog=s16478;Integrated Security=True";
@@ -41,11 +41,6 @@ namespace aplikacja5.Services
             }
         }
 
-       
-
-
-
-
         public Student GetStudent(string IndexNumber)
         {
             using (var client = new SqlConnection(CONNECTION_STRING))
@@ -72,7 +67,6 @@ namespace aplikacja5.Services
                 }
 
             }
-
             return null;
         }
 
@@ -112,11 +106,8 @@ namespace aplikacja5.Services
             throw new System.NotImplementedException();
         }
 
-
-
         public Enrollment EnrollStudent(EnrollStudentRequest request)
         {
-
             using (var con = new SqlConnection(CONNECTION_STRING))
             using (var com = new SqlCommand())
             {
@@ -142,7 +133,6 @@ namespace aplikacja5.Services
 
                     dataReader.Close();
 
-
                     // wyciągam ogólnie największy IdEnrollment, żeby póżniej dodać nowy Enrollment z tą wartoscia zwiekszona o 1
                     com.CommandText = "select max(ISNULL(IdEnrollment,0)) from Enrollment";
                     dataReader = com.ExecuteReader();
@@ -150,7 +140,6 @@ namespace aplikacja5.Services
                     {
                         _generalMaxIdEnrollment = (int)dataReader[0];
                     }
-
 
                     dataReader.Close();
 
@@ -167,11 +156,9 @@ namespace aplikacja5.Services
                         com.Parameters.AddWithValue("nextIdEnrollment", _idEnrollment);
                         com.Parameters.AddWithValue("idStudies", _idStudies);
                         com.Parameters.AddWithValue("currentDate", currentDate);
-
                     }
                     _idEnrollment = (int)dataReader[0];
                     dataReader.Close();
-
 
                     // sprawdzenie czy istnieje w bazie ktos o podanym numerze indeksu
                     com.CommandText = "SELECT * FROM Student WHERE IndexNumber = @givenIndex";
@@ -196,18 +183,13 @@ namespace aplikacja5.Services
                         dataReader.Close();
 
                         com.ExecuteNonQuery();
-
                     }
-
-
                     transaction.Commit();
-
                 }
                 catch (SqlException exc)
                 {
                     transaction.Rollback();
                 }
-
             }
             Enrollment newStudentEnrollment = new Enrollment
             {
@@ -216,7 +198,6 @@ namespace aplikacja5.Services
                 IdStudy = _idStudies,
                 StartDate = DateTime.Now
             };
-
             return newStudentEnrollment;
         }
 
@@ -236,15 +217,14 @@ namespace aplikacja5.Services
 
 
                 try
-                {
-                    com.ExecuteNonQuery();
-                    transaction.Commit();
-                }
-                catch (SqlException e)
-                {
-                    transaction.Rollback();
-                    return null;
-                }
+                    {
+                        com.ExecuteNonQuery();
+                        transaction.Commit();
+                } catch (SqlException e)
+                    {
+                        transaction.Rollback();
+                        return null;
+                    }
 
 
                 com.CommandText = "SELECT * FROM Enrollment WHERE IdStudy = (SELECT IdStudy FROM Studies WHERE Name = @Name AND Semester = @Semester + 1)";
@@ -265,9 +245,8 @@ namespace aplikacja5.Services
                     {
                         return null;
                     }
-
                     dataReader.Close();
-                    // returning 201 -- return Created (uri, objectValue)
+
                     return newPromotionEnrollment;
                 }
             }
