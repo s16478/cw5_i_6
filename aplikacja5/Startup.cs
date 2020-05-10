@@ -1,3 +1,4 @@
+using aplikacja5.Middlewares;
 using aplikacja5.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -33,13 +34,15 @@ namespace aplikacja5
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMiddleware<LoggingMiddleware>();
+
             app.Use(async (context, next) =>
             {
                 if (!context.Request.Headers.ContainsKey("Index"))
                 {
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     await context.Response.WriteAsync("You have to give your index number!");
-                    return;
+                    return; // short-circuit
                 }
 
                 string index = context.Request.Headers["Index"].ToString();
@@ -48,7 +51,7 @@ namespace aplikacja5
                 {
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     await context.Response.WriteAsync("This index number does not exist!");
-                    return;
+                    return; 
                 }
 
                 await next();
